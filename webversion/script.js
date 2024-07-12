@@ -5,10 +5,10 @@ let originalImageData;
 function loadImage(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    
-    reader.onload = function(e) {
+
+    reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             canvas.width = img.width;
             canvas.height = img.height;
             context.drawImage(img, 0, 0);
@@ -56,17 +56,17 @@ function closestColor(pixel, palette) {
 
 function getBayerMatrix(level) {
     const bayer2 = [
-        [0, 2], 
+        [0, 2],
         [3, 1]
     ];
-    
+
     const bayer4 = [
         [0, 8, 2, 10],
         [12, 4, 14, 6],
         [3, 11, 1, 9],
         [15, 7, 13, 5]
     ];
-    
+
     const bayer8 = [
         [0, 32, 8, 40, 2, 34, 10, 42],
         [48, 16, 56, 24, 50, 18, 58, 26],
@@ -77,7 +77,7 @@ function getBayerMatrix(level) {
         [15, 47, 7, 39, 13, 45, 5, 37],
         [63, 31, 55, 23, 61, 29, 53, 21]
     ];
-    
+
     const bayer16 = [
         [0, 128, 32, 160, 8, 136, 40, 168, 2, 130, 34, 162, 10, 138, 42, 170],
         [192, 64, 224, 96, 200, 72, 232, 104, 194, 66, 226, 98, 202, 74, 234, 106],
@@ -103,17 +103,17 @@ function getBayerMatrix(level) {
 
 function getOrderedMatrix(level) {
     const ordered2 = [
-        [1, 3], 
+        [1, 3],
         [4, 2]
     ];
-    
+
     const ordered4 = [
         [1, 9, 3, 11],
         [13, 5, 15, 7],
         [4, 12, 2, 10],
         [16, 8, 14, 6]
     ];
-    
+
     const ordered8 = [
         [1, 33, 9, 41, 3, 35, 11, 43],
         [49, 17, 57, 25, 51, 19, 59, 27],
@@ -145,6 +145,7 @@ function getOrderedMatrix(level) {
     ];
 
     const matrices = [ordered2, ordered4, ordered8, ordered16];
+    console.log(matrices, level);
     return matrices[level].map(row => row.map(v => v / (matrices[level].length * matrices[level].length + 1) - 0.5));
 }
 
@@ -156,6 +157,17 @@ function applyColorQuantization(imageData, palette) {
         data[i] = closest[0];
         data[i + 1] = closest[1];
         data[i + 2] = closest[2];
+    }
+    return new ImageData(data, imageData.width, imageData.height);
+}
+
+function applyBrightness(imageData, brightness) {
+    const data = imageData.data.slice(); // Copy the data
+    for (let i = 0; i < data.length; i += 4) {
+        // Modify the R, G, B values
+        data[i] = Math.min(255, Math.max(0, data[i] * brightness));
+        data[i + 1] = Math.min(255, Math.max(0, data[i + 1] * brightness));
+        data[i + 2] = Math.min(255, Math.max(0, data[i + 2] * brightness));
     }
     return new ImageData(data, imageData.width, imageData.height);
 }
@@ -180,7 +192,7 @@ function applyDithering(imageData, spread, redColorCount, greenColorCount, blueC
         for (let x = 0; x < width; x++) {
             const index = (y * width + x) * 4;
             const matrixValue = ditherMatrix[y % ditherMatrix.length][x % ditherMatrix[0].length];
-            
+
             const pixel = [
                 data[index],
                 data[index + 1],
@@ -215,7 +227,7 @@ function applyMaskToImage(originalImageData, maskImageData, applyWhite) {
     for (let i = 0; i < originalData.length; i += 4) {
         const isBlack = maskData[i] === 0 && maskData[i + 1] === 0 && maskData[i + 2] === 0;
         const isWhite = maskData[i] === 255 && maskData[i + 1] === 255 && maskData[i + 2] === 255;
-        
+
         if (applyWhite && isWhite) {
             // Apply white mask
             originalData[i] = 255;
@@ -238,7 +250,7 @@ function applyScaling(imageData, scaleMultiplier, resampleFilter) {
     const height = imageData.height;
     const newWidth = Math.round(width * 2 ** scaleMultiplier);
     const newHeight = Math.round(height * 2 ** scaleMultiplier);
-    
+
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = newWidth;
     tempCanvas.height = newHeight;
@@ -285,47 +297,50 @@ const colorQuantizationButton = document.getElementById('applyColorQuantization'
 let colorQuantizationState = false;
 const thresholdLevelSelect = document.getElementById('thresholdDitherLevel');
 let thresholdLevelState = thresholdLevelSelect.value;
-const bayerLevelSelect = document.getElementById('bayerDitherLevel');
-let bayerLevelState = bayerLevelSelect.value;
+const ditherLevelSelect = document.getElementById('ditherLevel');
+let ditherLevelState = ditherLevelSelect.value;
+const bayerDitherRadio = document.getElementById('bayerDither');
+const orderedDitherRadio = document.getElementById('orderedDither');
+const noDitherRadio = document.getElementById('noDither');
 const clearCanvasButton = document.getElementById('clearCanvas');
 const downloadImageButton = document.getElementById('downloadImage');
-const orderedLevelSelect = document.getElementById('orderedDitherLevel');
-let orderedLevelState = orderedLevelSelect.value;
 const thresholdHighlightSelect = document.getElementById('thresholdHighlightLevel');
 let thresholdHighlightState = thresholdHighlightSelect.value;
-const contrastLevelSelect = document.getElementById('contrastLevel');
-let contrastLevelState = contrastLevelSelect.value;
+const brightnessSelect = document.getElementById('brightnessLevel');
+let brightnessState = brightnessSelect.value;
 
 const applyFilters = () => {
     if (!imageData) return;
-    
+
     let newImageData = context.createImageData(imageData.width, imageData.height);
     newImageData.data.set(new Uint8ClampedArray(imageData.data)); // Copy the image data
-    
-    if (contrastLevelState && contrastLevelState != 0) {
-        newImageData = changeContrast(newImageData, contrastLevelState);
+
+    if (brightnessState && brightnessState != 1) {
+        newImageData = applyBrightness(newImageData, brightnessState);
     }
-    
+
     if (thresholdLevelState && thresholdLevelState != -1) {
         maskData = thresholdImage(thresholdLevelState, newImageData);
-        newImageData = applyMaskToImage(newImageData, maskData);   
+        newImageData = applyMaskToImage(newImageData, maskData);
     }
 
     if (thresholdHighlightState && thresholdHighlightState != -1) {
         maskData = thresholdImage(thresholdHighlightState, newImageData);
         newImageData = applyMaskToImage(newImageData, maskData, true);
     }
-    
-    if (orderedLevelState && orderedLevelState != -1){
-        newImageData = ditherImage('ordered', orderedLevelState, newImageData);
+
+    if (!noDitherRadio.checked) {
+        console.log('dithering');
+        if (bayerDitherRadio.checked) {
+            console.log('bayer');
+            newImageData = ditherImage('bayer', ditherLevelState, newImageData);
+        } else if (orderedDitherRadio.checked) {
+            console.log('ordered');
+            newImageData = ditherImage('ordered', ditherLevelState, newImageData);
+        }
     }
 
-    
-    if (bayerLevelState && bayerLevelState != -1) {
-        newImageData = ditherImage('bayer', bayerLevelState, newImageData);
-    }
-    
-    
+
     if (colorQuantizationState) {
         newImageData = applyColorQuantization(newImageData, [
             [255, 16, 16],    // Red
@@ -336,7 +351,7 @@ const applyFilters = () => {
             [255, 255, 255]   // White
         ]);
     }
-    
+
     context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     canvas.width = newImageData.width;
     canvas.height = newImageData.height;
@@ -378,9 +393,9 @@ scaleUpButton.addEventListener('click', (event) => {
     context.putImageData(imageData, 0, 0);
 });
 
-bayerLevelSelect.addEventListener('change', (event) => {
-    bayerLevelState = event.target.value;
-    document.getElementById('bayerDitherLevelValue').innerText = bayerLevelState;
+ditherLevelSelect.addEventListener('change', (event) => {
+    ditherLevelState = event.target.value;
+    document.getElementById('ditherLevelValue').innerText = ditherLevelState;
     applyFilters();
 });
 
@@ -391,20 +406,26 @@ resampleFilterSelect.addEventListener('change', (event) => {
     applyFilters();
 });
 
-orderedLevelSelect.addEventListener('change', (event) => {
-    orderedLevelState = event.target.value;
-    document.getElementById('orderedDitherLevelValue').innerText = orderedLevelState;
-    applyFilters();
-});
-
 thresholdHighlightSelect.addEventListener('change', (event) => {
     thresholdHighlightState = 255 - event.target.value;
-    document.getElementById('thresholdHighlightLevelValue').innerText = thresholdHighlightState;
+    document.getElementById('thresholdHighlightLevelValue').innerText = event.target.value;
     applyFilters();
 });
 
-contrastLevelSelect.addEventListener('change', (event) => {
-    contrastLevelState = event.target.value;
-    document.getElementById('contrastLevelValue').innerText = contrastLevelState;
+bayerDitherRadio.addEventListener('click', (event) => {
+    applyFilters();
+});
+
+orderedDitherRadio.addEventListener('click', (event) => {
+    applyFilters();
+});
+
+noDitherRadio.addEventListener('click', (event) => {
+    applyFilters();
+});
+
+brightnessSelect.addEventListener('change', (event) => {
+    brightnessState = event.target.value;
+    document.getElementById('brightnessLevelValue').innerText = brightnessState;
     applyFilters();
 });
