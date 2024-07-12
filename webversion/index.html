@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dithering and Quantization Demo</title>
+</head>
+
+<body>
+    <h1>Dithering and Quantization Demo</h1>
+    <input type="file" id="upload" accept="image/*">
+    <br>
+    <p>Scale Image</p>
+    <!-- <input type="range" id="scaleFactor" min="-10" value="0" max="10" step="1">
+    <span id="scaleFactorValue">0</span>
+    <br> -->
+    <label for="resampleFilter">Resample Filter:</label>
+    <select id="resampleFilter">
+        <option value="nearest">Nearest Neighbor</option>
+        <option value="bilinear">Bilinear</option>
+        <option value="bicubic">Bicubic</option>
+    </select>
+    <button id="scaleImageDown">Scale Down</button>
+    <button id="scaleImageUp">Scale Up</button>
+    <br><br>
+    <button id="applyColorQuantization">Apply Color Quantization</button>
+    <br>
+    <p>Dark Threshold Level</p>
+    <input type="range" id="thresholdDitherLevel" min="-1" max="255" step="1" value="-1">
+    <span id="thresholdDitherLevelValue">0</span>
+    <br>
+    <p>Light Threshold Level</p>
+    <input type="range" id="thresholdHighlightLevel" min="-1" max="255" step="1" value="-1">
+    <span id="thresholdHighlightLevelValue">0</span>
+    <br>
+    <p>Bayer Dithering Level</p>
+    <input type="range" id="bayerDitherLevel" min="-1" max="2" step="1" value="-1">
+    <span id="bayerDitherLevelValue">0</span>
+    <br>
+    <p>Ordered Dithering Level</p>
+    <input type="range" id="orderedDitherLevel" min="-1" max="3" step="1" value="-1">
+    <span id="orderedDitherLevelValue">0</span>
+    <br>
+    <button id="clearCanvas">Reset Canvas</button>
+    <br>
+    <button id="downloadImage">Download Image</button>
+    <br>
+    <canvas id="canvas" style="border: 1px solid red;"></canvas>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Dependency directories
+lib/
+libs/
+library/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Testing
+htmlcov/
+.coverage
+.tox/
+.noseids
+nosetests.xml
+coverage.xml
+
+# Miscellaneous
+*.bak
+*.swp
+*.tmp
+*.log
+*.cache
+*.DS_Store
+*.pyc
+*.bak
+*.tmp
+*.log
+*.vscode/
