@@ -4,57 +4,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dithering and Quantization Demo</title>
+    <title>Flipnote Filter</title>
+    <link rel="stylesheet" href="./css/custom-fonts.css">
+    <link rel="stylesheet" href="./css/flipnote.css">
+    <script src="./js/script.js" defer></script>
+    <link rel="icon" href="./img/favicon.ico">
 </head>
 
 <body>
-    <h1>Dithering and Quantization Demo</h1>
-    <input type="file" id="upload" accept="image/*">
-    <br>
-    <p>Scale Image</p>
-    <!-- <input type="range" id="scaleFactor" min="-10" value="0" max="10" step="1">
-    <span id="scaleFactorValue">0</span>
-    <br> -->
-    <label for="resampleFilter">Resample Filter:</label>
-    <select id="resampleFilter">
-        <option value="nearest">Nearest Neighbor</option>
-        <option value="bilinear">Bilinear</option>
-        <option value="bicubic">Bicubic</option>
-    </select>
-    <br>
-    <button id="scaleImageDown">Scale Down</button>
-    <button id="scaleImageUp">Scale Up</button>
-    <p>Brightness Level</p>
-    <input type="range" id="brightnessLevel" min="1" max="5" step=".25" value="1">
-    <span id="brightnessLevelValue">0</span>
-    <br>
-    <button id="applyColorQuantization">Apply Color Quantization</button>
-    <br>
-    <p>Dark Threshold Level</p>
-    <input type="range" id="thresholdDitherLevel" min="-1" max="255" step="1" value="-1">
-    <span id="thresholdDitherLevelValue">0</span>
-    <br>
-    <p>Light Threshold Level</p>
-    <input type="range" id="thresholdHighlightLevel" min="-1" max="255" step="1" value="-1">
-    <span id="thresholdHighlightLevelValue">0</span>
+    <h1>Dithering and Quantization and a little more</h1>
+    <div id="controlPanel">
+        <input type="file" id="upload" accept="image/*">
+        <p>Scale Image</p>
+        <label for="resampleFilter">Resample Filter:</label>
+        <select id="resampleFilter">
+            <option value="nearest">Nearest Neighbor</option>
+            <option value="bilinear">Bilinear</option>
+            <option value="bicubic">Bicubic</option>
+        </select>
+        <button id="scaleImageUp">Scale Up</button>
+        <button id="scaleImageDown">Scale Down</button>
+        <div class="row">
+            <p>Brightness Level</p>
+            <span id="brightnessLevelValue">0</span>
+        </div>
+        <input type="range" id="brightnessLevel" min="0" max="4" step=".1" value="1">
+        <button id="applyColorQuantization">Apply Color Quantization</button>
+        <div class="row">
+            <p>Dark Threshold Level</p>
+            <span id="thresholdDitherLevelValue">0</span>
+        </div>
+        <input type="range" id="thresholdDitherLevel" min="-1" max="255" step="1" value="-1">
+        <div class="row">
+            <p>Light Threshold Level</p>
+            <span id="thresholdHighlightLevelValue">0</span>
+        </div>
+        <input type="range" id="thresholdHighlightLevel" min="-1" max="255" step="1" value="-1">
 
-    <p>Dithering Type</p>
-    <input type="radio" id="noDither" name="ditherType" value="noDither" checked>
-    <label for="noDither">None</label>
-    <input type="radio" id="bayerDither" name="ditherType" value="bayerDither">
-    <label for="bayerDither">Bayer</label>
-    <input type="radio" id="orderedDither" name="ditherType" value="orderedDither">
-    <label for="orderedDither">Ordered</label>
-    <p>Dithering Level</p>
-    <input type="range" id="ditherLevel" min="0" max="3" step="1" value="-1">
-    <span id="ditherLevelValue">0</span>
-    <br>
-    <button id="clearCanvas">Reset Canvas</button>
-    <br>
-    <button id="downloadImage">Download Image</button>
-    <br>
-    <canvas id="canvas"></canvas>
-    <script src="script.js"></script>
+        <p>Dithering Type</p>
+        <div class="row">
+            <input type="radio" id="noDither" name="ditherType" value="noDither" checked>
+            <label for="noDither">None</label>
+        </div>
+        <div class="row">
+            <input type="radio" id="bayerDither" name="ditherType" value="bayerDither">
+            <label for="bayerDither">Bayer</label>
+        </div>
+        <div class="row">
+            <input type="radio" id="orderedDither" name="ditherType" value="orderedDither">
+            <label for="orderedDither">Ordered</label>
+        </div>
+        <div class="row">
+            <p>Dithering Level</p>
+            <span id="ditherLevelValue">0</span>
+        </div>
+        <input type="range" id="ditherLevel" min="0" max="3" step="1" value="-1">
+        <button id="clearCanvas">Reset Canvas</button>
+        <button id="downloadImage">Download Image</button>
+    </div>
+    <div id="canvasWrapper">
+        <canvas id="canvas"></canvas>
+    </div>
 </body>
 
 </html>
